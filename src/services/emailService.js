@@ -1,9 +1,20 @@
-async function emailService(email) {
-    const command = `holehe holehe ${email}`
+const { executeCommand } = require('../containers/dockerContainer');
 
-    const response = {message: "Service is under development."}
-
-    return response;
+async function checkEmail(io, email, socketId) {
+    try {
+        const result = await executeCommand(io, email, socketId);
+        return {
+            success: true,
+            message: "Email check completed",
+            data: result
+        };
+    } catch (error) {
+        return {
+            success: false,
+            error: error.message,
+            message: "Failed to check email"
+        };
+    }
 }
 
-module.exports = emailService;
+module.exports = { checkEmail };

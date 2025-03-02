@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Email Checker</title>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <input type="email" id="email" placeholder="Enter email">
+    <button id="getEmails">Check Email</button>
+    <div id="output"></div>
+
+    <script>
+        const socket = io("http://localhost:3000");
+
+        socket.on('connect', () => {
+            console.log('Connected to server');
+        });
+
+        socket.on('containerOutput', (data) => {
+            const outputDiv = document.getElementById('output');
+            const line = document.createElement('div');
+            
+            switch(data.type) {
+                case 'output':
+                    line.style.color = 'black';
+                    break;
+                case 'error':
+                    line.style.color = 'red';
+                    break;
+                case 'complete':
+                    line.style.color = 'green';
+                    break;
+            }
+            
+            line.textContent = data.data;
+            outputDiv.appendChild(line);
+        });
+
+        document.getElementById('getEmails').addEventListener('click', () => {
+            console.log("Clicked...");
+            checkEmail();
+        });
+
+        function checkEmail() {
+            const email = document.getElementById('email').value;
+            
+            fetch('http://localhost:3000/api/v1/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    email: email,
+                    socketId: socket.id
+                })
+            });
+        }
+    </script>
+</body>
+</html>
